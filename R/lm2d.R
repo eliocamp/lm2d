@@ -7,7 +7,7 @@ lm2d <- function(x, y, data = NULL,
                  verbose = FALSE) {
    fit_function <- match.fun(paste0("fit_", method[1]))
 
-   if (verbose) message("Parsing data")
+   maybe_message("Parsing data")
    # Housekeeping. Getting data and transforming it to matrix
    x <- enrich_formula(x)
    force(y)
@@ -25,8 +25,8 @@ lm2d <- function(x, y, data = NULL,
 
    y <- tidy2matrix(data, x$dims, y_name, fill = NULL)$matrix[, 1]
 
-   if (verbose) message("Computing EOF")
-   g$matrix <- scale(g$matrix, scale = FALSE)
+   maybe_message("Computing EOF")
+   # g$matrix <- scale(g$matrix, scale = FALSE)
 
    if (max_eof < 1) {
       max_eof <- round(max_eof*min(nrow(g$matrix), ncol(g$matrix)))
@@ -34,16 +34,10 @@ lm2d <- function(x, y, data = NULL,
       max_eof <- min(max_eof, nrow(g$matrix) - 1, ncol(g$matrix) - 1)
    }
 
-   if (max_eof >= 0.5*min(nrow(g$matrix), ncol(g$matrix))) {
-      svd_fun <- base::svd
-   } else {
-      svd_fun <- irlba::irlba
-   }
-
-   eof <- svd_fun(g$matrix, max_eof, max_eof)
+   eof <- smart_svd(g$matrix, max_eof)
    eof$d <- eof$d[seq_len(max_eof)]
 
-   if (verbose) message("Fitting")
+   maybe_message("Fitting")
    fit <- fit_function(eof$u*sqrt(N), y)
    non_zero <- which(fit$coef != 0)
 

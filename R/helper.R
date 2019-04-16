@@ -1,3 +1,14 @@
+smart_svd <- function(X, max_eof) {
+    if (requireNamespace("irlba", quietly = TRUE) &
+        max_eof >= 0.5*min(nrow(X), ncol(X))) {
+      irlba::irlba(X, max_eof, max_eof)
+    } else {
+      svd(X, max_eof, max_eof)
+    }
+}
+
+
+
 
 tidy2matrix <- function(data, formula, value.var, fill = NULL, ...) {
   row.vars <- all.vars(formula[[2]])
@@ -67,4 +78,11 @@ data_from_formula <- function(formula, data, extra.vars = NULL) {
     data <- data.table::setDT(data)[, (all.cols), with = FALSE]
   }
   return(data)
+}
+
+
+maybe_message <- function(text) {
+  if (verbose) {
+    message(text)
+  }
 }
