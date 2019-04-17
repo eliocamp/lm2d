@@ -1,3 +1,4 @@
+#' @export
 summary.lm2d <- function(object, ..., colors = TRUE) {
   cat("Call:")
   cat("\n ", deparse(object$call), sep = "")
@@ -15,32 +16,38 @@ summary.lm2d <- function(object, ..., colors = TRUE) {
 
   cat("Fit used ", object$summary$non_zero,
       " principal components (of the possible ",
-      length(object$coef_eof), ") with coefficients:", sep = "")
-  cat("\n")
-  trunc <- "...[truncated]"
+      length(object$fit), ")")
 
-  w <- min(length(object$coef_eof), options()$width - nchar(trunc)-8)
-  w <- seq_len(w)
-  print(sparkbars::sparkbars(object$coef_eof[w], colors = colors))
-  if (length(object$coef_eof) > options()$width - nchar(trunc)) {
-    cat(trunc)
-  }
+  if (check_package("sparkbars", NULL)) {
+    cat(" with coefficients:", sep = "")
+    cat("\n")
+    trunc <- "...[truncated]"
+
+    w <- min(length(object$fit), options()$width - nchar(trunc)-8)
+    w <- seq_len(w)
+
+    print(sparkbars::sparkbars(object$fit[w], colors = colors))
+    if (length(object$fit) > options()$width - nchar(trunc)) {
+      cat(trunc)
+    }}
+
 }
 
+#' @export
 print.lm2d <- function(x, ..., colors = TRUE) {
   summary(x, colors = colors)
 }
 
 
 
-autoplot.lm2d <- function(object, ...) {
-  variables <- formula.tools::get.vars(object$call$x)
+#' @export
+plot.lm2d <- function(x, ...) {
+  variables <- formula.tools::get.vars(x$call$x)
   xy <- variables[seq(length(variables)-1, length(variables))]
-  estimate <- as.character(object$call$y)
+  estimate <- as.character(x$call$y)
 
-  ggplot(object$field, aes_string(xy[1], xy[2])) +
-    geom_raster(aes_string(fill = estimate), ...)
+  check_package("ggplot2")
+  ggplot2::ggplot(x$field, ggplot2::aes_string(xy[1], xy[2])) +
+    ggplot2::geom_raster(ggplot2::aes_string(fill = estimate), ...)
 }
 
-
-plot.lm2d <- autoplot.lm2d

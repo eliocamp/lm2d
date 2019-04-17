@@ -1,6 +1,6 @@
 smart_svd <- function(X, max_eof) {
-    if (requireNamespace("irlba", quietly = TRUE) &
-        max_eof >= 0.5*min(nrow(X), ncol(X))) {
+    if (check_package("irlba", NULL) &
+        max_eof < 0.5*min(nrow(X), ncol(X))) {
       irlba::irlba(X, max_eof, max_eof)
     } else {
       svd(X, max_eof, max_eof)
@@ -9,11 +9,11 @@ smart_svd <- function(X, max_eof) {
 
 
 
-
+#' @import data.table
 tidy2matrix <- function(data, formula, value.var, fill = NULL, ...) {
   row.vars <- all.vars(formula[[2]])
   col.vars <- all.vars(formula[[3]])
-  data <- as.data.table(data)
+  data <- data.table::setDT(data)
   data[, row__ := .GRP, by = c(row.vars)]
   data[, col__ := .GRP, by = c(col.vars)]
   if (is.null(fill)){
@@ -35,6 +35,11 @@ tidy2matrix <- function(data, formula, value.var, fill = NULL, ...) {
 }
 
 
+as.character.formula <- function(x, ...) {
+  form <- paste(deparse(x), collapse = " ")
+  form <- gsub("\\s+", " ", form, perl = FALSE)
+  return(form)
+}
 
 
 enrich_formula <- function(formula) {
@@ -66,8 +71,8 @@ data_from_formula <- function(formula, data, extra.vars = NULL) {
   attr(formula$formula, ".Environment") <- env
 
   if (is.null(data)) {
-    data <- as.data.table(eval(quote(model.frame(Formula::as.Formula(formula$formula),
-                                                 data  = data))))
+    data <- eval(quote(model.frame(Formula::as.Formula(formula$formula),
+                                                 data  = data)))
   } else {
     # Check if columns are indata
     all.cols <- c(formula$value.var, formula$row.vars, formula$col.vars, extra.vars)
@@ -75,14 +80,24 @@ data_from_formula <- function(formula, data, extra.vars = NULL) {
     if (length(missing.cols) != 0) {
       stop(paste0("Columns not found in data: ", paste0(missing.cols, collapse = ", ")))
     }
-    data <- data.table::setDT(data)[, (all.cols), with = FALSE]
+    data <- as.data.frame(data)[all.cols]
   }
   return(data)
 }
 
 
-maybe_message <- function(text) {
-  if (verbose) {
-    message(text)
+
+check_package <- function(package,
+                          message = paste0("Package ", package, " not installed.")) {
+  if (!requireNamespace(package, quietly = TRUE)) {
+    if (is.null(message)) {
+      return(FALSE)
+    } else {
+      stop(message, call. = FALSE)
+    }
   }
+  invisible(TRUE)
 }
+
+
+if(getRversion() >= "2.15.1")  utils::globalVariables(c("col__", "row__"))

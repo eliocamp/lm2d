@@ -2,10 +2,28 @@ Package: lm2d
 Type: Package
 Title: What the Package Does (Title Case)
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Authors@R: 
+    c(person(given = "Elio",
+           family = "Campitelli",
+           role = c("cre", "aut"),
+           email = "elio.campitelli@cima.fcen.uba.ar",
+           comment = c(ORCID = "0000-0002-7742-9230")))
+Description: Regresses a 2D scalar field into one time series using the method descibed by 
+  DelSole and Yang (2011) <doi: 10.1175/2011JCLI4105.1>.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 6.1.1
+Imports: 
+    data.table,
+    formula.tools,
+    Formula,
+    stringr,
+    withr,
+    sparkbars (>= 0.0.0.9000)
+Suggests: 
+    glmnet,
+    irlba,
+    ggplot2
+Remotes:  
+    eliocamp/sparkbars
