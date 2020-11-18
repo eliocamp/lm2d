@@ -4,9 +4,17 @@
 \alias{lm2d}
 \title{Regress a 2d field}
 \usage{
-lm2d(x, y, data = NULL, method = c("cv", "lasso", "naive"),
-  max_eof = Inf, k_fold = 10, alpha = 1, seed = 42,
-  verbose = FALSE)
+lm2d(
+  x,
+  y,
+  data = NULL,
+  method = c("cv", "lasso", "naive"),
+  max_eof = Inf,
+  k_fold = 10,
+  alpha = 1,
+  seed = 42,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{x}{a formula to build the scalar field (see Details)}

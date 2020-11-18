@@ -60,7 +60,11 @@ lm2d <- function(x, y, data = NULL,
    data <- data_from_formula(formula = x,
                              data = data,
                              extra.vars = y_name)
-   g <- tidy2matrix(data, x$dims, x$value.var, fill = NULL)
+
+   g <- tidy2matrix(data, x$dims, c(x$value.var, y_name), fill = NULL)
+   y <- g$matrix[[2]][, 1]
+
+   g$matrix <- g$matrix[[1]]
 
    if (length(g$matrix) < nrow(data)) {
       stop(paste("The formula", as.character(x), "does not identify an unique observation for each cell."))
@@ -68,7 +72,6 @@ lm2d <- function(x, y, data = NULL,
 
    N <- length(g$rowdims[[1]])
 
-   y <- tidy2matrix(data, x$dims, y_name, fill = NULL)$matrix[, 1]
 
    maybe_message("Computing EOF")
    g$matrix <- scale(g$matrix, scale = FALSE)

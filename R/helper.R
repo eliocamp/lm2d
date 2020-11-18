@@ -27,9 +27,18 @@ tidy2matrix <- function(data, formula, value.var, fill = NULL, ...) {
 
   data.m <- matrix(fill[1], nrow = max(data[["row__"]]),
                    ncol = max(data[["col__"]]))
-  data.m[cbind(data[["row__"]], data[["col__"]])] <- data[[value.var]]
 
-  return(list(matrix = data.m,
+  matrix <- list()
+  for (v in seq_along(value.var)) {
+    data.m[, ] <- fill[1]
+    data.m[cbind(data[["row__"]], data[["col__"]])] <- data[[value.var[v]]]
+
+    matrix[[v]] <- data.m
+
+  }
+
+
+  return(list(matrix = matrix,
               coldims = coldims,
               rowdims = rowdims))
 }
