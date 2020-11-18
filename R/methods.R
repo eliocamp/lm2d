@@ -1,10 +1,10 @@
 #' @export
 summary.lm2d <- function(object, ..., colors = TRUE) {
   cat("Call:")
-  cat("\n ", deparse(object$call), sep = "")
+  cat("\n ", gsub("[ ]{2,}", " ", paste(deparse(object$call), collapse = " ")))
   cat("\n")
   object$summary <- lapply(object$summary, function(d) as.character(signif(d, 2)))
-  nchars <- vapply(object$summary, nchar, FUN.VALUE = 1)
+
 
   cat("\n")
   cat("R-squared   = ", object$summary$r2, sep = "")
@@ -14,9 +14,9 @@ summary.lm2d <- function(object, ..., colors = TRUE) {
   cat("p-value     = ", object$summary$p.value, sep = "")
   cat("\n\n")
 
-  cat("Fit used ", object$summary$non_zero,
+  cat(paste0("Fit used ", object$summary$non_zero,
       " principal components (of the possible ",
-      length(object$fit), ")")
+      length(object$fit), ")"))
 
   if (check_package("sparkbars", NULL)) {
     cat(" with coefficients:", sep = "")
