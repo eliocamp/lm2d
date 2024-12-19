@@ -38,14 +38,12 @@
 #' DelSole, T., & Yang, X. (2011). Field Significance of Regression Patterns. Journal of Climate, 24(19), 5094–5107. https://doi.org/10.1175/2011JCLI4105.1
 #' @export
 lm2d <- function(x, y, data = NULL,
-                 method = c("cv", "lasso", "naive"),
+                 method = fit_cv(),
                  max_eof = Inf,
                  k_fold = 10,
                  alpha = 1,
                  seed = 42,
                  verbose = FALSE) {
-   fit_function <- match.fun(paste0("fit_", method[1]))
-
    maybe_message <- function(text) {
       if (verbose) {
          message(text)
@@ -92,11 +90,11 @@ lm2d <- function(x, y, data = NULL,
 
 
    maybe_message("Fitting")
-   fit <- fit_function(eof$u*sqrt(N), y, params)
+   fit <- method(eof$u*sqrt(N), y)
    non_zero <- which(fit$coef != 0)
 
    E <- eof$v%*%diag(eof$d, nrow = length(eof$d))/sqrt(N)
-   coef_real <- (fit$coef / var(y) * apply(eof$u*sqrt(N), 2, var)) %*% t(E)
+   coef_real <- (fit$coef / stats::var(y) * apply(eof$u*sqrt(N), 2, stats::var)) %*% t(E)
 
    M <- length(non_zero)
    N <- length(y)
@@ -106,7 +104,7 @@ lm2d <- function(x, y, data = NULL,
                  fit = fit$coef,
                  summary = data.frame(r2 = fit$r2,
                                       f.statistic = f.statistic,
-                                      p.value = pf(f.statistic, N, N - M - 1, lower.tail = FALSE),
+                                      p.value = stats::pf(f.statistic, N, N - M - 1, lower.tail = FALSE),
                                       non_zero = M,
                                       N  = N),
                  call = match.call()

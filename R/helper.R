@@ -64,7 +64,7 @@ enrich_formula <- function(formula) {
   col.vars <- stringr::str_squish(stringr::str_split(matrix.vars[2], "\\+")[[1]])
 
   dcast.formula <- stringr::str_squish(f[stringr::str_detect(f, "\\|")])
-  dcast.formula <- as.formula(stringr::str_replace(dcast.formula, "\\|", "~"))
+  dcast.formula <- stats::as.formula(stringr::str_replace(dcast.formula, "\\|", "~"))
   value.var <- stringr::str_squish(f[!stringr::str_detect(f, "\\|")])
 
   return(list(formula = formula,

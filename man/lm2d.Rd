@@ -8,7 +8,7 @@ lm2d(
   x,
   y,
   data = NULL,
-  method = c("cv", "lasso", "naive"),
+  method = fit_cv(),
   max_eof = Inf,
   k_fold = 10,
   alpha = 1,
